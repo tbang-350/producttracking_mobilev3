@@ -17,28 +17,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   User user = User("", "");
-  // String url = Uri.parse("http://192.168.27.199/auth/authenticate") as String;
-  // Future save() async {
-  //   await http.post(url,
-  //       headers: {'Context-Type': 'aplication/json'},
-  //       body: jsonEncode(
-  //           {'userName': user.userName, 'userPassword': user.userPassword}));
-  // }
-
-  Future save() async {
-    Map data = {"userName": user.userName, "userPassword": user.userPassword};
-
-    var body = json.encode(data);
-    var url = Uri.parse(baseUrl + '/authenticate');
-    http.Response response = await http.post(url, headers: headers, body: body);
-    print(response.body);
-    print('http body: $body');
-    if (response.body != null) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => CameraPage()));
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,6 +80,10 @@ class _LoginState extends State<Login> {
                       },
                       style: TextStyle(fontSize: 30, color: Colors.white),
                       decoration: InputDecoration(
+                        errorStyle: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white
+                        ),
                           border:
                               OutlineInputBorder(borderSide: BorderSide.none)),
                     ),
@@ -127,6 +110,7 @@ class _LoginState extends State<Login> {
                       onChanged: (val) {
                         user.userPassword = val;
                       },
+                      obscureText: true,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return 'Password is empty';
@@ -157,7 +141,8 @@ class _LoginState extends State<Login> {
                 child: FloatingActionButton(
                   backgroundColor: Colors.blue,
                   onPressed: () {
-                    save();
+                    
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>CameraPage()));
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40),

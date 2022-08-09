@@ -1,11 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:exif/exif.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
-
+import 'package:http/http.dart' as http;
+import 'meta.dart';
+import 'globals.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key}) : super(key: key);
@@ -18,6 +20,7 @@ class _CameraPageState extends State<CameraPage> {
   File? imageFile;
   String dirPath = '';
   var location = Location();
+  // Meta meta = Meta("","");
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +67,7 @@ class _CameraPageState extends State<CameraPage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () =>
-                        {getImage(source: ImageSource.camera), getLocation()},
+                        {getImage(source: ImageSource.camera)},
                     child: const Text('Capture Image',
                         style: TextStyle(fontSize: 18)),
                   ),
@@ -75,7 +78,7 @@ class _CameraPageState extends State<CameraPage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () =>
-                        {getImage(source: ImageSource.gallery), getLocation()},
+                        {getImage(source: ImageSource.gallery)},
                     child: const Text(
                       'Select Image',
                       style: TextStyle(fontSize: 18),
@@ -87,13 +90,13 @@ class _CameraPageState extends State<CameraPage> {
             Row(
               children: [
                 Expanded(
-                  child:ElevatedButton(
-                    onPressed: () =>{},
+                  child: ElevatedButton(
+                    onPressed: () => {getLocation()},
                     child: const Text(
                       'Send Data',
                       style: TextStyle(fontSize: 18),
                     ),
-                  ), 
+                  ),
                 )
               ],
             )
@@ -156,7 +159,27 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     var currentLocation = await location.getLocation();
+    var latitude = currentLocation.latitude;
+    var longitude = currentLocation.longitude;
     print("-current location is $currentLocation ");
-  }
 
+    Future save() async {
+      Map data = {
+        "latitude": currentLocation.latitude,
+        "longitude": currentLocation.longitude
+      };
+
+      var body = json.encode(data);
+      var url = Uri.parse(baseUrl + '/addMetadata');
+      http.Response response =
+          await http.post(url, headers: headers, body: body);
+      print(response.body);
+      print('http body: $body');
+      if (response.body != null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:new Text("data sent")));
+      }
+    }
+
+    save();
+  }
 }
